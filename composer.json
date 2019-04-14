@@ -1,0 +1,21 @@
+{
+    "name": "belca/gename",
+    "description": "File name & name generator for Dios CMS",
+    "keywords": ["filename", "generator", "name", "dios", "dioscms", "belca"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Oleg Dmitrochenko",
+            "email": "dmitrochenkooleg@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require-dev": {
+        "phpunit/phpunit": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Belca\\GeName\\": "src"
+        }
+    }
+}
