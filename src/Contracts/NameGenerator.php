@@ -5,8 +5,9 @@ namespace Belca\GeName\Contracts;
 /**
  * Генератор имен.
  *
- * Генерирует любые имена по заданным параметрам, в т.ч. имена файлов.
- * В качестве параметров генерации используется шаблон имени и данные шаблона.
+ * Генерирует любые имена по заданным правилам, в т.ч. имена файлов.
+ * Для генерации используется шаблон имени, исходные значения, правила
+ * генерации, генераторы значений.
  */
 interface NameGenerator
 {
@@ -14,6 +15,7 @@ interface NameGenerator
      * Задает шаблон генерации имени.
      *
      * @param string $pattern Шаблон имени
+     * @return boolean
      */
     public function setPattern($pattern);
 
@@ -25,18 +27,44 @@ interface NameGenerator
     public function getPattern();
 
     /**
-     * Задает параметры шаблона.
+     * Задает исходные данные для генерации.
      *
-     * @param array $params Параметры шаблона
+     * @param array $initialData Параметры шаблона
      */
-    public function setParams($params = []);
+    public function setInitialData($initialData);
 
     /**
-     * Возвращает параметры шаблона.
+     * Возвращает все исходные данные для генерации.
      *
      * @return array
      */
-    public function getParams();
+    public function getInitialData();
+
+    /**
+     * Возвращает исходные данные для генератора на основе выражения и/или
+     * имени генератора.
+     *
+     * @param  string $expression
+     * @param  string $generator
+     * @return mixed
+     */
+    public function getGeneratorInitialData($expression, $generator);
+
+    /**
+     * Возвращает исходные данные для генератора по выражению.
+     *
+     * @param  string $expression
+     * @return mixed
+     */
+    public function getInitialDataByExpression($expression);
+
+    /**
+     * Возвращает исходные данные для генератора по названию генератора.
+     *
+     * @param  string $generator
+     * @return mixed
+     */
+    public function getInitialDataByGenerator($generator);
 
     /**
      * Задает рабочую директорию.
@@ -91,38 +119,71 @@ interface NameGenerator
     public function getExceptions();
 
     /**
-     * Устанавливает классы методов генерации.
+     * Устанавливает классы генерации значений.
      *
-     * @param mixed $methods Методы и классы генерации имен
+     * @param mixed $generators Названия генераторов и классы генерации значений
      */
-    public function setMethods($methods);
+    public function setGenerators($generators);
 
     /**
-     * Возвращает список классов методов генерации имен. Если указан конкретный
-     * метод, то возвращает его значение.
+     * Возвращает список генераторов значений. Если указан конкретный
+     * генератор, то возвращает его данные.
      *
-     * @param  string $method Метод генерации
+     * @param  string $generator Название генератора
      * @return mixed
      */
-    public function getMethods($method = null);
+    public function getGenerators($generator = null);
 
     /**
-     * Возвращает имя класса указанного метода генерации имен.
+     * Возвращает имя класса указанного генератора.
      *
-     * @param  string $method Метод генерации
+     * @param  string $generator Название генератора
      * @return string
      */
-    public function getMethod($method);
+    public function getGenerator($generator);
+
+    /**
+     * Добавляет в список генераторов значений новый класс. Если
+     * $replace - true, то заменяет класс с таким же названием генератора.
+     *
+     * При успешном добавлении возвращает true.
+     *
+     * @param string  $generatorName  Имя генератора
+     * @param string  $generatorClass Имя класса
+     * @param boolean $replace        Заменять класс при совпадении имени генератора
+     * @return bool
+     */
+    public function addGenerator($generatorName, $generatorClass, $replace = true);
+
+    /**
+     * Удаляет генератор значений по названию генератора.
+     *
+     * При успешном удалении возвращает true.
+     *
+     * @param  string $generatorName
+     * @return bool
+     */
+    public function removeGeneratorByGeneratorName($generatorName);
+
+    /**
+     * Удаляет генератор значений по имени класса.
+     *
+     * При успешном удалении возвращает true.
+     *
+     * @param  string $className
+     * @return bool
+     */
+    public function removeGeneratorByGeneratorClassName($className);
 
     /**
      * Устанавливает список новых запрещенных символов.
      *
-     * @param mixed $symbols Запрещенные символы
+     * @param mixed $symbols
      */
     public function setForbiddenSymbols($symbols);
 
     /**
-     * Возвращает список запрещенных символов.
+     * Возвращает список запрещенных символов, если они заданы.
      *
      * @return mixed
      */
@@ -145,59 +206,41 @@ interface NameGenerator
     public function removeForbiddenSymbol($symbol);
 
     /**
-     * Устанавливает список генераторов значений параметров шаблона.
+     * Устанавливает список новых разрешенных символов.
      *
-     * @param mixed $generators Генераторы значений шаблона
+     * @param mixed $symbols
      */
-    public function setParamGenerators($generators);
+    public function setAllowedSymbols($symbols);
 
     /**
-     * Возвращает список генераторов значений шаблона или указанный генератор.
+     * Возвращает все разрешенные символы, если они заданы.
      *
-     * @param  string $generator Имя генератора
-     * @return string
+     * @return mixed
      */
-    public function getParamGenerators($generator = null);
+    public function getAllowedSymbols();
 
     /**
-     * Добавляет в список генераторов значений шаблона новый класс. Если
-     * $replace - true, то заменяет класс с таким же именем параметра.
+     * Добавляет новый разрешенный символ.
      *
-     * При успешном добавлении возвращает true.
+     * @param string $symbol     Запрещенный символ
+     * @param string $substitute Заменяющий символ
+     */
+    public function addAllowedSymbol($symbol);
+
+    /**
+     * Удаляет разрешенный символ из списка разрешенных символов.
      *
-     * @param string  $parameterName  Имя параметра
-     * @param string  $generatorClass Имя класса
-     * @param boolean $replace        Заменять класс при совпадении имени параметра
+     * @param  string $symbol
      * @return bool
      */
-    public function addParamGenerator($parameterName, $generatorClass, $replace = true);
+    public function removeAllowedSymbol($symbol);
 
     /**
-     * Удаляет генератор значений по названию параметра.
-     *
-     * При успешном удалении возвращает true.
-     *
-     * @param  string $parameterName Название параметра или название генератора параметра.
-     * @return bool
-     */
-    public function removeParamGeneratorByParameterName($parameterName);
-
-    /**
-     * Удаляет генератор значения параметра по имени класса.
-     *
-     * При успешном удалении возвращает true.
-     *
-     * @param  string $className Имя класса-генератора
-     * @return bool
-     */
-    public function removeParamGeneratorByGeneratorClassName($className);
-
-    /**
-     * Генерирует имя.
+     * Генерирует и возвращает имя.
      *
      * @return string
      */
-    protected function generate();
+    public function generate();
 
     /**
      * Сгенерировать и вернуть одно имя.
@@ -205,6 +248,13 @@ interface NameGenerator
      * @return string
      */
     public function generateName();
+
+    /**
+     * Вернуть сгенерированное имя.
+     *
+     * @return string
+     */
+    public function getGeneratedName();
 
     /**
      * Сгенерировать и вернуть указанное количество имен.
