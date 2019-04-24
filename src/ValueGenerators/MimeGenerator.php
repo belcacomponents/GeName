@@ -4,11 +4,11 @@ namespace Belca\GeName\ValueGenerators;
 
 use Belca\GeName\ValueGenerators\ValueGeneratorAbstract;
 use Belca\GeName\ValueGenerators\SpecialDataInConstructorTrait;
-
+use Belca\GeName\ValueGenerators\ArgsParserTrait;
 
 class MimeGenerator extends ValueGeneratorAbstract
 {
-    use SpecialDataInConstructorTrait;
+    use SpecialDataInConstructorTrait, ArgsParserTrait;
 
     /**
      * Аргументы генерации значения по умолчанию.
@@ -30,9 +30,9 @@ class MimeGenerator extends ValueGeneratorAbstract
     {
         if (isset($this->initialData)) {
             $mime = explode('/', $this->initialData);
-
+            
             if (count($mime) >= 2) {
-                $value = $args['value'] ?? $defaultArgs['value'] ?? 'group';
+                $value = $this->args['value'] ?? $this->defaultArgs['value'] ?? 'group';
 
                 if ($value == 'type') {
                     return $mime[1];

@@ -4,10 +4,11 @@ namespace Belca\GeName\ValueGenerators;
 
 use Belca\GeName\ValueGenerators\ValueGeneratorAbstract;
 use Belca\GeName\ValueGenerators\DefaultValueInConstructorTrait;
+use Belca\GeName\ValueGenerators\ArgsParserTrait;
 
 class StringGenerator extends ValueGeneratorAbstract
 {
-    use DefaultValueInConstructorTrait;
+    use DefaultValueInConstructorTrait, ArgsParserTrait;
 
     /**
      * Аргументы генерации значения по умолчанию.
@@ -25,7 +26,7 @@ class StringGenerator extends ValueGeneratorAbstract
      */
     public function generate()
     {
-        return $this->random($args['length'] ?? $defaultArgs['length'] ?? 16);
+        return $this->random($this->args['length'] ?? $this->defaultArgs['length'] ?? 16);
     }
 
     /**

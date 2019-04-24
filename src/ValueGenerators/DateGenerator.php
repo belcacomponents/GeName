@@ -4,10 +4,11 @@ namespace Belca\GeName\ValueGenerators;
 
 use Belca\GeName\ValueGenerators\ValueGeneratorAbstract;
 use Belca\GeName\ValueGenerators\DefaultValueInConstructorTrait;
+use Belca\GeName\ValueGenerators\ArgsParserTrait;
 
 class DateGenerator extends ValueGeneratorAbstract
 {
-    use DefaultValueInConstructorTrait;
+    use DefaultValueInConstructorTrait, ArgsParserTrait;
 
     /**
      * Аргументы генерации значения по умолчанию.
@@ -25,6 +26,6 @@ class DateGenerator extends ValueGeneratorAbstract
      */
     public function generate()
     {
-        return date($args['format'] ?? $defaultArgs['format'] ?? "Y-m-d");
+        return date($this->args['format'] ?? $this->defaultArgs['format'] ?? "Y-m-d");
     }
 }

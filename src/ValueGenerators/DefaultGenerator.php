@@ -16,6 +16,6 @@ class DefaultGenerator extends ValueGeneratorAbstract
      */
     public function generate()
     {
-        return $this->default;
+        return (is_string($this->default)) ? $this->default : '';
     }
 }

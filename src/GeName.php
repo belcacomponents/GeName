@@ -33,6 +33,8 @@ class GeName implements NameGenerator
      */
     protected $defaultGenerator = \Belca\GeName\ValueGenerators\DefaultGenerator::class;
 
+    protected $replaceMissingValuesWithGeneratorName = true;
+
     /**
      * Задает шаблон генерации имени.
      *
@@ -222,7 +224,7 @@ class GeName implements NameGenerator
      */
     public function getGenerator($name)
     {
-        return $this->generators[$name] ?? $defaultGenerator ?? null;
+        return $this->generators[$name] ?? $this->defaultGenerator ?? null;
     }
 
     /**
@@ -365,17 +367,14 @@ class GeName implements NameGenerator
         $generators = [];
         $generatedValues = [];
 
-        // TODO для списка генераторов можем иметь интерфейсный/абстрактный класс, который
-        // возвращает список существующих генераторов и соответственных интерфейсов
-        // все генераторы подключаются к GeName.
-        // Такой список можно задавать вручную, часть берется автоматом при инициализации класса
-        // можно задать список классов
-
         foreach ($expressions as $expression) {
+
+            // Получаем класс генератора по выражению и имени генератора.
+            // Если генератора нет, то используем генератор по умолчанию.
+            // Если генератора нет, в т.ч. по умолчанию, то либо заменяем значение
+            // названием генератора, либо пустотой, либо исходным значением,
+            // в зависимости от настроек класса.
             $generatorName = $parser->getGeneratorNameByExpression($expression);
-            // Получаем класс генератора по имени генератора, если его нет, то
-            // проверяем наличие генератора по умолчанию,
-            // если его нет, то пропускаем значение или позже заменяем на имя функции (управляется)
             $generator = $this->getGenerator($generatorName);
 
             if (isset($generator) && class_exists($generator) && is_subclass_of($generator, ValueGenerator::class)) {
@@ -383,23 +382,44 @@ class GeName implements NameGenerator
                 $generators[$expression] = new $generator($initialData);
 
                 // Аргументы передаем по полному соответствию функции
-                // TODO там должен быть парсинг данных по трейту!
                 $generators[$expression]->setRawArgs($parser->getGeneratorArguments($expression));
                 $generatedValues[$expression] = $generators[$expression]->generate();
             }
 
+            // Если выражению не была найдена замена, то заменяем на исходные
+            // данные, если были указаны, на название выражения или на пустую,
+            // в зависимости от настроек класса.
+            if (empty($generatedValues[$expression])) {
+                $initialData = $this->getGeneratorInitialData($expression, $generatorName);
 
+                if (! empty($initialData) && is_string($initialData)) {
+                    $generatedValues[$expression] = $initialData;
+                } elseif (isset($this->replaceMissingValuesWithGeneratorName) && $this->replaceMissingValuesWithGeneratorName) {
+                    $generatedValues[$expression] = $generatorName;
+                } else {
+                    $generatedValues[$expression] = '';
+                }
+            }
         }
 
-        dd($generatedValues);
+        $name = str_replace($expressions, $generatedValues, $this->pattern);
+        //dd($name);
 
-        // С помощью str_replace заменить данные строк
+        // Если указана рабочая директория, то проверяем наличие файла
+        if (isset($this->directory)) {
+            $exists = file_exists($this->directory.'/'.$name); // TODO через while
+            // Лучше проверку файла задавать отдельно
+            // и проверять через функцию файл сохраненный через generateName
+        }
 
         // если указана проверка на директорию, то проверяем
         // если совпадает, то генерируем значение повторно без новой инициализации классов
         // только заново запускаем и сохраняем значения
 
-        return '';
+        // Также может быть обертка: используется через трейты и использование
+        // активации/деактивации и использовать декоратор
+
+        return $name;
     }
 
     /**
