@@ -405,6 +405,8 @@ class GeName implements NameGenerator
         $name = str_replace($expressions, $generatedValues, $this->pattern);
         //dd($name);
 
+        // TODO Проверять на исключенные имена
+
         // Если указана рабочая директория, то проверяем наличие файла
         if (isset($this->directory)) {
             $exists = file_exists($this->directory.'/'.$name); // TODO через while
@@ -447,7 +449,10 @@ class GeName implements NameGenerator
      */
     public function generateNames($counts)
     {
+        // TODO  должен сгенерировать указанное количество имен с учетом исключающих имен
+        $this->generatedName = $this->generate();
 
+        return $this->generatedName;
     }
 
     public function getGeneratedNames()
