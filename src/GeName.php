@@ -10,19 +10,96 @@ class GeName implements NameGenerator
 {
     use EmbeddedGenerators;
 
+    /**
+     * Шаблон генерации имени.
+     *
+     * @var string
+     */
     protected $pattern;
 
+    /**
+     * Исходные данные для генерации имени.
+     *
+     * @var mixed
+     */
     protected $initialData;
 
+    /**
+     * Путь к рабочей директории.
+     *
+     * @var string|null
+     */
     protected $directory;
 
+    /**
+     * Список исключенных имен.
+     *
+     * Если указаны имена файлов, то имена должны быть указаны относительно
+     * заданной директории.
+     *
+     * @var array
+     */
     protected $exceptions;
 
+    // WARNING: Можно использовать либо $allowedSybomls, $forbiddenSymbols,
+    // но не вместе.
+    // Приоритетом считаются запрещенные символы.
+    // Реализация запрещенных символов осуществляется в обработчиках, т.о.
+    // указание запрещенных символов может не оказать никакого эффекта.
+
+    /**
+     * Разрешенные символы.
+     *
+     * Пустой массив или null считаются, что все символы разрешены.
+     *
+     * @var array
+     */
+    protected $allowedSybomls;
+
+    /**
+     * Запрещенные символы.
+     *
+     * Содержит список запрещенных символов, и заменяющие значения, если
+     * запрещенные символы необходимо заменять.
+     *
+     * @var mixed
+     */
+    protected $forbiddenSymbols;
+
+    /**
+     * Список генераторов: ключ - код генератора, значение - класс генератора.
+     *
+     * @var array
+     */
     protected $generators;
 
+    /**
+     * Сгенерированное имя.
+     *
+     * @var array
+     */
     protected $generatedName;
 
+    /**
+     * Список сгенерированных имен.
+     *
+     * @var array
+     */
     protected $generatedNames;
+
+    /**
+     * Сгенерированные значения для одного имени.
+     *
+     * @var array
+     */
+    protected $generatedValues;
+
+    /**
+     * Сгенерированные значения для списка имен.
+     *
+     * @var array
+     */
+    protected $generatedValuesNames;
 
     /**
      * Генератор по умолчанию.
@@ -149,7 +226,7 @@ class GeName implements NameGenerator
     /**
      * Возвращает путь к рабочей директории.
      *
-     * @return string
+     * @return string|null
      */
     public function getDirectory()
     {
@@ -163,11 +240,41 @@ class GeName implements NameGenerator
      * относительно указанной директории. Если false, то выполняется проверка
      * существования файла, с учетом абсолютного пути имени файла.
      *
+     * Пример.
+     *
+     *
+     * #1. Путь относительно корневой директории:
+     *
+     * $directory = '', $filename = '/usr/var/www/app/files/gename.txt'
+     *
+     * В таком случае можно осуществлять относительную проверку. Также путь
+     * к файлам может быть абсолютно любым, например, '/home/user/files/'.
+     *
+     *
+     * #2. Путь относительно директории с файлами:
+     *
+     * $directory = '/usr/var/www/app/files/', $filename = 'gename.txt'
+     *
+     * В таком случае осуществляется относительная проверка файла и проверка
+     * всех генерируемых имен будет осуществляться относительно указанной
+     * директории.
+     *
+     *
+     * #3. Абсолютный путь к файлу:
+     *
+     * $directory = null, $filename = '/usr/var/www/app/files/gename.txt'
+     *
+     * В таком случае может осуществляться только абсолютная проверка файла,
+     * а путь к файлу или шаблон генерации имени файла должен быть с абсолютным
+     * путем к файлу.
+     * Также, допускается такой вариант использования, если не используется
+     * проверка существования файла с указанным имененем.
+     *
      * @param  boolean $relative
      */
     public function relativeFileExists($relative = true)
     {
-
+        $this->relative = $relative;
     }
 
     /**
@@ -181,7 +288,7 @@ class GeName implements NameGenerator
     }
 
     /**
-     * Возвращает список исключений.
+     * Возвращает список исключений - запрещенные имена для генерации.
      *
      * @return array
      */
@@ -240,7 +347,8 @@ class GeName implements NameGenerator
      */
     public function addGenerator($generatorName, $generatorClass, $replace = true)
     {
-
+        // TODO добавляет класс обработчика в список обработчиков,
+        // при этом выполняется проверка интерфейса генератора
     }
 
     /**
@@ -253,7 +361,7 @@ class GeName implements NameGenerator
      */
     public function removeGeneratorByGeneratorName($generatorName)
     {
-
+        // TODO удаляет класс при успешном удалении возвращает true
     }
 
     /**
@@ -266,7 +374,8 @@ class GeName implements NameGenerator
      */
     public function removeGeneratorByGeneratorClassName($className)
     {
-
+        // TODO осуществляет список всех классов с указанным имененм и возвращает
+        // количество удаленных обработчиков
     }
 
     /**
@@ -297,7 +406,7 @@ class GeName implements NameGenerator
      */
     public function addForbiddenSymbol($symbol, $substitute = '', $replace = true)
     {
-
+        // TODO список запрещенных символов
     }
 
     /**
@@ -308,7 +417,7 @@ class GeName implements NameGenerator
      */
     public function removeForbiddenSymbol($symbol)
     {
-
+        // TODO список запрещенных символов
     }
 
     /**
@@ -318,7 +427,7 @@ class GeName implements NameGenerator
      */
     public function setAllowedSymbols($symbols)
     {
-
+        // TODO список запрещенных символов
     }
 
     /**
@@ -328,7 +437,7 @@ class GeName implements NameGenerator
      */
     public function getAllowedSymbols()
     {
-
+        return $this->allowedSybomls;
     }
 
     /**
@@ -339,7 +448,7 @@ class GeName implements NameGenerator
      */
     public function addAllowedSymbol($symbol)
     {
-
+        // TODO разрешенный символ
     }
 
     /**
@@ -350,15 +459,18 @@ class GeName implements NameGenerator
      */
     public function removeAllowedSymbol($symbol)
     {
-
+        // TODO удаляет символ
     }
 
     /**
-     * Генерирует имя.
+     * Генерирует имя и возвращает сгенерированое имя.
      *
-     * @return string
+     * @param  integer $attempts               Количество попыток генерации имени
+     * @param  array   $exceptions             Список исключенных имен
+     * @param  boolean $returnGeneratedValues  Возвращать массив "[имя, сгенерированные значения]"
+     * @return string|boolean|mixed
      */
-    public function generate()
+    public function generate($attempts = 10, $exceptions = [], $returnGeneratedValues = false)
     {
         $parser = new PatternParser();
         $parser->parse($this->pattern);
@@ -380,6 +492,10 @@ class GeName implements NameGenerator
             if (isset($generator) && class_exists($generator) && is_subclass_of($generator, ValueGenerator::class)) {
                 $initialData = $this->getGeneratorInitialData($expression, $generatorName);
                 $generators[$expression] = new $generator($initialData);
+
+                // TODO в генератор нужно передать разрешенные и запрещенные символы,
+                // и он сам должен решить, нужно ли их обрабатывать или нет.
+                // Также туда передаются исключенные имена
 
                 // Аргументы передаем по полному соответствию функции
                 $generators[$expression]->setRawArgs($parser->getGeneratorArguments($expression));
@@ -403,11 +519,12 @@ class GeName implements NameGenerator
         }
 
         $name = str_replace($expressions, $generatedValues, $this->pattern);
-        //dd($name);
 
         // TODO Проверять на исключенные имена
+        // $exceptions
 
-        // Если указана рабочая директория, то проверяем наличие файла
+        // Если указана рабочая директория, то проверяем наличие файла,
+        // иначе проверка файла отключена.
         if (isset($this->directory)) {
             $exists = file_exists($this->directory.'/'.$name); // TODO через while
             // Лучше проверку файла задавать отдельно
@@ -421,42 +538,100 @@ class GeName implements NameGenerator
         // Также может быть обертка: используется через трейты и использование
         // активации/деактивации и использовать декоратор
 
-        return $name;
+        return $returnGeneratedValues ? [$name, $generatedValues] : $name;
     }
 
     /**
-     * Сгенерировать и вернуть одно имя.
+     * Генерирует, сохраняет в текущем экземпляре класса и возвращает одно имя.
      *
+     * Если $exceptions = null, то будут использованы значения исключений
+     * глобальных переменных.
+     *
+     * @param  integer $attempts   Количество попыток генерации имени
+     * @param  array   $exceptions Список исключенных имен
      * @return string
      */
-    public function generateName()
+    public function generateName($attempts = 10, $exceptions = null)
     {
-        $this->generatedName = $this->generate();
+        list($this->generatedName, $this->generatedValues) = $this->generate($attempts, $exceptions ?? $this->exceptions, true);
 
         return $this->generatedName;
     }
 
+    /**
+     * Возвращает сгенерированное имя, если оно было сгенерировано функцией
+     * generateName().
+     *
+     * @return string
+     */
     public function getGeneratedName()
     {
         return $this->generatedName;
     }
 
     /**
-     * Сгенерировать и вернуть указанное количество имен.
+     * Возвращает сгенерированные значения к одному имени, если они были
+     * сгенерированы функцией generateName().
      *
-     * @param  integer $counts Количество генерируемых имен
      * @return array
      */
-    public function generateNames($counts)
+    public function getGeneratedValues()
     {
-        // TODO  должен сгенерировать указанное количество имен с учетом исключающих имен
-        $this->generatedName = $this->generate();
+        return $this->generatedValues;
+    }
+
+    /**
+     * Генерирует и возвращает указанное количество имен.
+     *
+     * @param  integer $counts     Количество генерируемых имен
+     * @param  boolean $duplicates Если true, то разрешены дубликаты имен
+     * @param  integer $attempts   Число попыток генерации одного имени
+     * @param  array   $exceptions Исключенные имена
+     * @return array
+     */
+    public function generateNames($counts, $duplicates = false, $attempts = 10, $exceptions = null)
+    {
+        $this->generatedNames = [];
+        $this->generatedValuesNames = [];
+
+        if (is_integer($counts) && $counts > 0) {
+
+            for ($i = 0; $i < $counts; $i++) { // TODO должен быть while и ограниченное число попыток генерации имени
+                list($name, $values) = $this->generate($attempts, $expressions, true);
+
+                // Если дубликаты запрещены, то проверяем наличие имени в текущем списке
+                if (! $duplicates) {
+                    // TODO выполняем поиск значений в текущем списке значений
+                    if (in_array($this->generatedNames, $name)) {
+                        // Сбрасываем итерацию и повторно генерируем имя
+                    }
+                }
+
+                $this->generatedNames[$i] = $name;
+                $this->generatedValuesNames[$i] = $values;
+            }
+        }
 
         return $this->generatedName;
     }
 
+    /**
+     * Возвращает сгенерированные имена.
+     *
+     * @return array
+     */
     public function getGeneratedNames()
     {
         return $this->generatedNames;
+    }
+
+    /**
+     * Возвращает сгенерированые значения списка имен.
+     *
+     * @return array
+     */
+    public function getGeneratedValuesNames()
+    {
+        return $this->generatedValuesNames;
     }
 }

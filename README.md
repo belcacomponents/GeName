@@ -50,3 +50,6 @@ $gename->setPattern($pattern);
 $gename->resetDirectory();
 
 $filename = $gename->generateName(); // output: 'document 2019-04-14 - Oleg Dmitrochenko'
+
+// Извлечение сгенерированных значений
+$values = $gename->getGeneratedValues();
