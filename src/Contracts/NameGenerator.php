@@ -173,7 +173,7 @@ interface NameGenerator
      * @param  string $className
      * @return bool
      */
-    public function removeGeneratorByGeneratorClassName($className);
+    public function removeGeneratorByClassName($className);
 
     /**
      * Устанавливает список новых запрещенных символов.

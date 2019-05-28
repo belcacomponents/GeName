@@ -372,7 +372,7 @@ class GeName implements NameGenerator
      * @param  string $className
      * @return bool
      */
-    public function removeGeneratorByGeneratorClassName($className)
+    public function removeGeneratorByClassName($className)
     {
         // TODO осуществляет список всех классов с указанным имененм и возвращает
         // количество удаленных обработчиков
@@ -578,6 +578,22 @@ class GeName implements NameGenerator
     public function getGeneratedValues()
     {
         return $this->generatedValues;
+    }
+
+    /**
+     * Возвращает указанное сгенерированное значение к одному имени, если оно
+     * было сгенерировано функцией generateName().
+     *
+     * Если значение не было сгенерировано вовсе, то возвращается значение
+     * $default, которое по умолчанию null.
+     *
+     * @param  string $name    Ключ значения (генератора) из шаблона имени
+     * @param  string $default Возвращаемое значение в случае отсутствия запрашиваемого значения
+     * @return string|null
+     */
+    public function getGeneratedValueByPropertyName($name, $default = null)
+    {
+        return $this->generatedValues[$name] ?? $default;
     }
 
     /**
