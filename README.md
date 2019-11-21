@@ -1,5 +1,6 @@
 # GeName - name generator
-Generates file name according to specified rules.
+
+Generates a file name according to specified rules: file names, titles, links, paths, etc.
 
 # GeName - генератор имен
 
@@ -16,7 +17,8 @@ $config = [
     'random_string' => \Belca\GeName\RandomStringGenerator::class,
 ];
 
-$gename = new GeName($config);
+$gename = new GeName();
+$gename->setInitialData($config);
 
 // File name generation. Example 1
 

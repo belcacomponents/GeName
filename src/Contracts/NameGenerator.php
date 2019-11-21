@@ -3,7 +3,7 @@
 namespace Belca\GeName\Contracts;
 
 /**
- * Генератор имен.
+ * Name generator.
  *
  * Генерирует любые имена по заданным правилам, в т.ч. имена файлов.
  * Для генерации используется шаблон имени, исходные значения, правила
@@ -12,29 +12,29 @@ namespace Belca\GeName\Contracts;
 interface NameGenerator
 {
     /**
-     * Задает шаблон генерации имени.
+     * Sets a name generation pattern.
      *
-     * @param string $pattern Шаблон имени
+     * @param  string   $pattern  A name pattern
      * @return boolean
      */
     public function setPattern($pattern);
 
     /**
-     * Возвращает шаблон генерации имени.
+     * Returns a name generation pattern.
      *
      * @return string
      */
     public function getPattern();
 
     /**
-     * Задает исходные данные для генерации.
+     * Sets parameters in the form associated array for name generation.
      *
-     * @param array $initialData Параметры шаблона
+     * @param array $initialData
      */
     public function setInitialData($initialData);
 
     /**
-     * Возвращает все исходные данные для генерации.
+     * Returns source data for name generation.
      *
      * @return array
      */
